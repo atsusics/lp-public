@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>RAT RACE — ラットレース</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --s1: #101010;
+  --s2: #181818;
+  --s3: #222222;
+  --border: #2a2a2a;
+  --border2: #383838;
+  --gold: #F0B429;
+  --gold-glow: rgba(240,180,41,0.15);
+  --green: #34D399;
+  --red: #F87171;
+  --blue: #60A5FA;
+  --white: #EFEFEF;
+  --dim: #ddd;
+  --dim2: #888;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth; color-scheme: dark; background:#080808;}
+body{background:#080808 !important;color:var(--white);font-family:'Noto Sans JP',sans-serif;overflow-x:hidden}
+
+/* CURSOR */
+* { cursor: default; }
+a, button { cursor: pointer; }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px 80px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 80px 80px 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-bg-line {
+  position: absolute;
+  top: 0; left: 50%;
+  width: 1px; height: 100%;
+  background: var(--border);
+  z-index: 1;
+}
+
+.hero-glow { display: none; }
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: fu 0.5s ease forwards 0.1s;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--gold);
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(56px, 7vw, 88px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fu 0.5s ease forwards 0.2s;
+}
+
+.hero-title .t1 { display: block; color: #ffffff; font-weight: 800; text-shadow: 0 0 40px rgba(0,0,0,0.8); }
+.hero-title .t2 { display: block; color: var(--gold); font-weight: 800; }
+.hero-title .t3 { display: block; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.8); }
+
+.hero-desc {
+  font-size: 15px;
+  line-height: 1.9;
+  color: #ccc;
+  max-width: 420px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fu 0.5s ease forwards 0.3s;
+}
+.hero-desc strong { color: var(--white); }
+
+.hero-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  animation: fu 0.5s ease forwards 0.4s;
+}
+
+.cta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-gold {
+  background: var(--gold);
+  color: #000;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  padding: 14px 28px;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-gold:hover { background: #fff; }
+
+.pre-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--dim);
+}
+.pre-count span { color: var(--gold); }
+
+/* HERO CARD */
+.hero-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 360px;
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0;
+  animation: fu 0.6s ease forwards 0.5s;
+}
+
+.card-top {
+  background: var(--s2);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-job {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.job-badge {
+  background: var(--gold-glow);
+  border: 1px solid rgba(240,180,41,0.3);
+  padding: 3px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.card-day {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--dim);
+}
+
+.card-balance {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.balance-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.balance-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: -1px;
+}
+
+.balance-flow {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.flow-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+}
+.flow-item.inc { color: var(--green); }
+.flow-item.exp { color: var(--red); }
+
+.card-event {
+  padding: 14px 20px;
+  background: rgba(240,180,41,0.02);
+  border-bottom: 1px solid var(--border);
+  border-left: 2px solid var(--gold);
+}
+
+.event-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.event-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.card-assets {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.asset-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border2);
+  font-size: 11px;
+}
+.asset-row:last-child { border-bottom: none; }
+.asset-name { color: var(--dim); display: flex; align-items: center; gap: 6px; }
+.asset-val { font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+.asset-val.up { color: var(--green); }
+.asset-val.dn { color: var(--red); }
+.asset-val.neu { color: var(--dim); }
+
+.card-actions {
+  padding: 12px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.act {
+  padding: 10px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.act.buy { background: rgba(52,211,153,0.1); color: var(--green); border-color: rgba(52,211,153,0.2); }
+.act.sell { background: rgba(248,113,113,0.1); color: var(--red); border-color: rgba(248,113,113,0.2); }
+.act.hold { background: var(--s3); color: var(--dim); border-color: var(--border2); }
+.act:hover { opacity: 0.7; transform: translateY(-1px); }
+
+/* ===== TICKER ===== */
+.ticker {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  overflow: hidden;
+  padding: 9px 0;
+}
+.ticker-inner {
+  display: flex;
+  white-space: nowrap;
+  animation: ticka 30s linear infinite;
+}
+.ti {
+  flex-shrink: 0;
+  padding: 0 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ti .u { color: var(--green); }
+.ti .d { color: var(--red); }
+@keyframes ticka { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ===== JOB SECTION ===== */
+.jobs-section { padding: 100px 80px; max-width: 1200px; margin: 0 auto; background: #080808; }
+
+.sec-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.sec-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 4vw, 54px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  margin-bottom: 16px;
+  color: #ffffff !important;
+}
+.sec-title .hl { color: var(--gold) !important; }
+
+.sec-body {
+  font-size: 15px;
+  color: #cccccc !important;
+  line-height: 1.8;
+  max-width: 520px;
+  margin-bottom: 56px;
+}
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+
+.job-card {
+  background: var(--s1);
+  padding: 28px 24px;
+  border-top: 2px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.job-card.rank-s { border-top-color: var(--gold); }
+.job-card.rank-a { border-top-color: var(--blue); }
+.job-card.rank-b { border-top-color: var(--green); }
+.job-card.rank-c { border-top-color: var(--red); }
+
+.job-card:hover { background: var(--s2); }
+
+.job-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+.rank-s .job-rank { color: var(--gold); }
+.rank-a .job-rank { color: var(--blue); }
+.rank-b .job-rank { color: var(--green); }
+.rank-c .job-rank { color: var(--red); }
+
+.job-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+.job-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+
+.job-stats {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.job-stat {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+}
+.job-stat .sk { color: var(--dim); }
+.job-stat .sv { }
+.job-stat .sv.up { color: var(--green); }
+.job-stat .sv.dn { color: var(--red); }
+.job-stat .sv.neu { color: var(--dim); }
+
+.job-bonus {
+  margin-top: 14px;
+  padding: 8px 10px;
+  background: var(--s3);
+  font-size: 11px;
+  color: #ccc;
+  line-height: 1.5;
+  border-left: 2px solid var(--border2);
+}
+
+/* ===== ASSETS ===== */
+.assets-section {
+  background: var(--s1);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 100px 80px;
+}
+
+.assets-inner { max-width: 1200px; margin: 0 auto; }
+
+.assets-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  margin-top: 56px;
+}
+
+.asset-card {
+  background: var(--bg);
+  padding: 24px 20px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.asset-card:hover { background: var(--s2); }
+
+.asset-card.lottery { border-bottom-color: var(--gold); }
+.asset-card.high { border-bottom-color: var(--red); }
+.asset-card.mid { border-bottom-color: var(--blue); }
+.asset-card.low { border-bottom-color: var(--green); }
+
+.ac-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+.ac-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.ac-risk {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.ac-risk.high { color: var(--red); }
+.ac-risk.mid { color: var(--gold); }
+.ac-risk.low { color: var(--green); }
+.ac-risk.special { color: var(--gold); }
+
+.ac-desc { font-size: 11px; color: var(--dim); line-height: 1.5; }
+
+/* ===== EVENTS ===== */
+.events-section { padding: 100px 80px; max-width: 1200px; margin: 0 auto; background: #080808; }
+
+.events-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 56px;
+}
+
+.events-col { display: flex; flex-direction: column; gap: 2px; }
+
+.ev-item {
+  background: var(--s1);
+  padding: 20px 24px;
+  transition: background 0.2s;
+  border-left: 2px solid transparent;
+}
+.ev-item.real { border-left-color: var(--blue); }
+.ev-item.fantasy { border-left-color: #A78BFA; }
+.ev-item:hover { background: var(--s2); }
+
+.ev-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+.ev-type.real { color: var(--blue); }
+.ev-type.fantasy { color: #A78BFA; }
+
+.ev-name { font-size: 13px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; }
+
+.ev-effects {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ev-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+.ev-tag.up { background: rgba(52,211,153,0.1); color: var(--green); }
+.ev-tag.dn { background: rgba(248,113,113,0.1); color: var(--red); }
+
+/* ===== RANKING ===== */
+.ranking-section {
+  background: var(--s1);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 100px 80px;
+}
+
+.ranking-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.rank-board {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+.rank-board-header {
+  padding: 12px 20px;
+  background: var(--s2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+
+.rank-board-header span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--dim);
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--red) !important;
+}
+.live-dot {
+  width: 5px; height: 5px;
+  background: var(--red);
+  border-radius: 50%;
+  animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 90px;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.rank-row:last-child { border-bottom: none; }
+.rank-row:hover { background: var(--s1); }
+.rank-row.me { background: var(--gold-glow); }
+
+.rn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--dim2);
+}
+.rn.gold { color: var(--gold); }
+
+.ru { display: flex; align-items: center; gap: 10px; }
+.ra {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--s2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  border: 1px solid var(--border);
+}
+.rname { font-size: 12px; font-weight: 700; }
+.rjob {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 1px;
+}
+
+.rret {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+.rret.up { color: var(--green); }
+.rret.dn { color: var(--red); }
+
+/* ===== GACHA ===== */
+.gacha-section {
+  padding: 100px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.gacha-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.gc {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  padding: 20px 16px;
+  text-align: center;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.gc:hover { transform: translateY(-3px); border-color: var(--border2); }
+.gc.rare { border-color: rgba(240,180,41,0.35); }
+.gc.rare::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(240,180,41,0.07), transparent 65%);
+}
+
+.gc-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.gc-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.gc-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.gc-desc { font-size: 10px; color: var(--dim); line-height: 1.4; }
+
+/* ===== CTA ===== */
+.cta-section {
+  background: var(--gold);
+  padding: 120px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-bg {
+  position: absolute;
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(120px, 22vw, 300px);
+  font-weight: 800;
+  color: rgba(0,0,0,0.06);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  letter-spacing: -8px;
+  pointer-events: none;
+}
+
+.cta-section .sec-title { color: #000; letter-spacing: -2px; position: relative; }
+.cta-section .sec-body { color: rgba(0,0,0,0.7); margin: 0 auto 36px; position: relative; }
+
+.btn-dark {
+  background: #000;
+  color: var(--gold);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 16px 36px;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-block;
+  position: relative;
+}
+.btn-dark:hover { background: #111; transform: translateY(-2px); }
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+footer p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 1px;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fu {
+  from { opacity:0; transform:translateY(14px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.r {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.r.in { opacity:1; transform:translateY(0); }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-left { padding: 80px 24px; }
+  .jobs-section, .assets-section, .events-section, .ranking-section, .gacha-section { padding: 80px 24px; }
+  .jobs-grid { grid-template-columns: 1fr 1fr; }
+  .assets-grid { grid-template-columns: repeat(2, 1fr); }
+  .events-split { grid-template-columns: 1fr; }
+  .ranking-inner { grid-template-columns: 1fr; gap: 40px; }
+  .gacha-section { grid-template-columns: 1fr; gap: 40px; }
+  footer { padding: 24px; flex-direction: column; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-bg-line"></div>
+
+  <div class="hero-left">
+    <div class="eyebrow">WEB GAME — 開発中</div>
+    <h1 class="hero-title">
+      <span class="t1">今日も</span>
+      <span class="t2">ラットレース。</span>
+      <span class="t3">RAT RACE</span>
+    </h1>
+    <p class="hero-desc">
+      毎日給料が入り、生活費が引かれていく。<br>
+      <strong>投資しなければ、一生ネズミのまま。</strong><br>
+      全員同じ相場、でも結果は違う。あなたの判断が問われる。
+    </p>
+    <div class="hero-cta">
+      <div class="cta-row">
+        <a href="https://x.com/atsusics_dev" target="_blank" class="btn-gold">𝕏 @atsusics_dev をフォロー</a>
+        <span class="pre-count">続報はXで発信中</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-card">
+      <div class="card-top">
+        <div class="card-job">
+          <span>🐀</span>
+          <div class="job-badge">PART-TIME</div>
+        </div>
+        <div class="card-day">DAY 23 / 30</div>
+      </div>
+      <div class="card-balance">
+        <div class="balance-label">TOTAL ASSETS</div>
+        <div class="balance-amount" id="balance">¥1,842,000</div>
+        <div class="balance-flow">
+          <span class="flow-item inc">▲ 給料 +¥280,000</span>
+          <span class="flow-item exp">▼ 固定費 -¥210,000</span>
+        </div>
+      </div>
+      <div class="card-event">
+        <div class="event-label">TODAY'S EVENT</div>
+        <div class="event-text">🐉 ドラゴンが金融街を占拠。<br>株市場が一時停止、債券に資金流入</div>
+      </div>
+      <div class="card-assets">
+        <div class="asset-row">
+          <span class="asset-name">📈 米国株</span>
+          <span class="asset-val dn" id="us">▼ -4.2%</span>
+        </div>
+        <div class="asset-row">
+          <span class="asset-name">📜 債券</span>
+          <span class="asset-val up" id="bond">▲ +3.1%</span>
+        </div>
+        <div class="asset-row">
+          <span class="asset-name">₿ BTC</span>
+          <span class="asset-val dn" id="btc">▼ -1.8%</span>
+        </div>
+        <div class="asset-row">
+          <span class="asset-name">🎰 宝くじ</span>
+          <span class="asset-val neu" id="lottery">— 今日の抽選待ち</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="act buy">BUY</div>
+        <div class="act sell">SELL</div>
+        <div class="act hold">HOLD</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ti">📈 米国株 <span class="d">▼ -4.2%</span></span>
+    <span class="ti">🏠 不動産 <span class="u">▲ +0.8%</span></span>
+    <span class="ti">₿ BTC <span class="d">▼ -1.8%</span></span>
+    <span class="ti">📜 債券 <span class="u">▲ +3.1%</span></span>
+    <span class="ti">🥇 金 <span class="u">▲ +2.3%</span></span>
+    <span class="ti">💴 ドル円 <span class="d">▼ -0.5%</span></span>
+    <span class="ti">🚀 スタートアップ <span class="u">▲ +7.1%</span></span>
+    <span class="ti">🎨 アート <span class="u">▲ +1.2%</span></span>
+    <span class="ti">🐉 FANTASY EVENT 発動中</span>
+    <span class="ti">📈 米国株 <span class="d">▼ -4.2%</span></span>
+    <span class="ti">🏠 不動産 <span class="u">▲ +0.8%</span></span>
+    <span class="ti">₿ BTC <span class="d">▼ -1.8%</span></span>
+    <span class="ti">📜 債券 <span class="u">▲ +3.1%</span></span>
+    <span class="ti">🥇 金 <span class="u">▲ +2.3%</span></span>
+    <span class="ti">💴 ドル円 <span class="d">▼ -0.5%</span></span>
+    <span class="ti">🚀 スタートアップ <span class="u">▲ +7.1%</span></span>
+    <span class="ti">🎨 アート <span class="u">▲ +1.2%</span></span>
+    <span class="ti">🐉 FANTASY EVENT 発動中</span>
+  </div>
+</div>
+
+<!-- JOBS -->
+<section class="jobs-section">
+  <div class="sec-label r">// JOB SYSTEM</div>
+  <h2 class="sec-title r">前のクールの結果が、<br><span class="hl">あなたの職業を決める。</span></h2>
+  <p class="sec-body r">上位なら医者・経営者。給料は多いが固定費も高い。下位ならアルバイト。元手は少ないが、失うものも少ない。どこからでも這い上がれる。</p>
+
+  <div class="jobs-grid r">
+    <div class="job-card rank-s">
+      <div class="job-rank">RANK S — TOP 10%</div>
+      <span class="job-icon">👨‍⚕️</span>
+      <div class="job-name">医者 / 弁護士</div>
+      <div class="job-stats">
+        <div class="job-stat"><span class="sk">月収</span><span class="sv up">+¥1,200,000</span></div>
+        <div class="job-stat"><span class="sk">固定費</span><span class="sv dn">-¥900,000</span></div>
+        <div class="job-stat"><span class="sk">余剰</span><span class="sv up">+¥300,000</span></div>
+      </div>
+      <div class="job-bonus">製薬株・医療系ETFにボーナス</div>
+    </div>
+    <div class="job-card rank-a">
+      <div class="job-rank">RANK A — TOP 30%</div>
+      <span class="job-icon">👔</span>
+      <div class="job-name">会社員（管理職）</div>
+      <div class="job-stats">
+        <div class="job-stat"><span class="sk">月収</span><span class="sv up">+¥600,000</span></div>
+        <div class="job-stat"><span class="sk">固定費</span><span class="sv dn">-¥380,000</span></div>
+        <div class="job-stat"><span class="sk">余剰</span><span class="sv up">+¥220,000</span></div>
+      </div>
+      <div class="job-bonus">米国株・債券にボーナス</div>
+    </div>
+    <div class="job-card rank-b">
+      <div class="job-rank">RANK B — TOP 60%</div>
+      <span class="job-icon">💼</span>
+      <div class="job-name">フリーランス</div>
+      <div class="job-stats">
+        <div class="job-stat"><span class="sk">月収</span><span class="sv up">+¥350,000</span></div>
+        <div class="job-stat"><span class="sk">固定費</span><span class="sv dn">-¥180,000</span></div>
+        <div class="job-stat"><span class="sk">余剰</span><span class="sv up">+¥170,000</span></div>
+      </div>
+      <div class="job-bonus">スタートアップ・BTCにボーナス</div>
+    </div>
+    <div class="job-card rank-c">
+      <div class="job-rank">RANK C — BOTTOM 40%</div>
+      <span class="job-icon">🛒</span>
+      <div class="job-name">アルバイト</div>
+      <div class="job-stats">
+        <div class="job-stat"><span class="sk">月収</span><span class="sv up">+¥130,000</span></div>
+        <div class="job-stat"><span class="sk">固定費</span><span class="sv dn">-¥80,000</span></div>
+        <div class="job-stat"><span class="sk">余剰</span><span class="sv up">+¥50,000</span></div>
+      </div>
+      <div class="job-bonus" style="border-left-color:var(--gold);color:var(--gold)">🎰 宝くじ当選確率が2倍。一発逆転を狙え。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ASSETS -->
+<section class="assets-section">
+  <div class="assets-inner">
+    <div class="sec-label r">// 10 ASSETS</div>
+    <h2 class="sec-title r">10種類の投資先。<br><span class="hl">手札は自分で作る。</span></h2>
+    <p class="sec-body r">職業によって有利な資産が変わる。同じイベントでも、持っている資産次第で正解は違う。それがこのゲームの面白さ。</p>
+
+    <div class="assets-grid r">
+      <div class="asset-card mid">
+        <span class="ac-icon">📈</span>
+        <div class="ac-name">米国株</div>
+        <div class="ac-risk mid">MEDIUM RISK</div>
+        <div class="ac-desc">世界最大の市場。経済ニュースに最も敏感に反応する。</div>
+      </div>
+      <div class="asset-card mid">
+        <span class="ac-icon">🗾</span>
+        <div class="ac-name">日本株</div>
+        <div class="ac-risk mid">MEDIUM RISK</div>
+        <div class="ac-desc">円安・円高イベントで独自の動きをする。</div>
+      </div>
+      <div class="asset-card low">
+        <span class="ac-icon">🏠</span>
+        <div class="ac-name">不動産</div>
+        <div class="ac-risk low">LOW RISK</div>
+        <div class="ac-desc">安定しているが流動性が低い。売りたい時に売れない。</div>
+      </div>
+      <div class="asset-card low">
+        <span class="ac-icon">📜</span>
+        <div class="ac-name">債券</div>
+        <div class="ac-risk low">LOW RISK</div>
+        <div class="ac-desc">利上げで下落。リスクオフ時に資金が流入する避難先。</div>
+      </div>
+      <div class="asset-card low">
+        <span class="ac-icon">🥇</span>
+        <div class="ac-name">金</div>
+        <div class="ac-risk low">LOW RISK</div>
+        <div class="ac-desc">有事に強い。ファンタジーイベントでも動きやすい。</div>
+      </div>
+      <div class="asset-card mid">
+        <span class="ac-icon">💴</span>
+        <div class="ac-name">為替（ドル円）</div>
+        <div class="ac-risk mid">MEDIUM RISK</div>
+        <div class="ac-desc">金利差に敏感。日米両方のイベントで動く。</div>
+      </div>
+      <div class="asset-card high">
+        <span class="ac-icon">₿</span>
+        <div class="ac-name">BTC</div>
+        <div class="ac-risk high">HIGH RISK</div>
+        <div class="ac-desc">最も激しく動く。一夜で倍にも半分にもなる。</div>
+      </div>
+      <div class="asset-card high">
+        <span class="ac-icon">🚀</span>
+        <div class="ac-name">スタートアップ</div>
+        <div class="ac-risk high">HIGH RISK</div>
+        <div class="ac-desc">成功すれば大化け。失敗すれば全額消える。</div>
+      </div>
+      <div class="asset-card mid">
+        <span class="ac-icon">🎨</span>
+        <div class="ac-name">アート</div>
+        <div class="ac-risk mid">MEDIUM RISK</div>
+        <div class="ac-desc">独自の動きをする。他の資産と相関しにくい分散先。</div>
+      </div>
+      <div class="asset-card lottery">
+        <span class="ac-icon">🎰</span>
+        <div class="ac-name">宝くじ</div>
+        <div class="ac-risk special">★ SPECIAL</div>
+        <div class="ac-desc">当たれば一発逆転。アルバイトは当選確率2倍。これだけが運ゲー。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="events-section">
+  <div class="sec-label r">// DAILY EVENTS</div>
+  <h2 class="sec-title r">今日何が来るか、<br><span class="hl">誰にもわからない。</span></h2>
+  <p class="sec-body r">リアルの経済ニュースとファンタジーイベントが毎日ランダムに降りかかる。同じイベントでも、手札によって正解は変わる。</p>
+
+  <div class="events-split r">
+    <div class="events-col">
+      <div class="ev-item real">
+        <div class="ev-type real">REAL EVENT</div>
+        <div class="ev-name">FRBが緊急利上げを0.5%実施</div>
+        <div class="ev-effects">
+          <span class="ev-tag dn">債券 ▼▼</span>
+          <span class="ev-tag dn">株 ▼</span>
+          <span class="ev-tag dn">不動産 ▼</span>
+          <span class="ev-tag up">ドル ▲</span>
+        </div>
+      </div>
+      <div class="ev-item real">
+        <div class="ev-type real">REAL EVENT</div>
+        <div class="ev-name">大手テック企業が予想を大幅に上回る決算発表</div>
+        <div class="ev-effects">
+          <span class="ev-tag up">米国株 ▲▲</span>
+          <span class="ev-tag up">スタートアップ ▲</span>
+        </div>
+      </div>
+      <div class="ev-item real">
+        <div class="ev-type real">REAL EVENT</div>
+        <div class="ev-name">原油産出国が減産を合意。エネルギー価格が急騰</div>
+        <div class="ev-effects">
+          <span class="ev-tag dn">株 ▼</span>
+          <span class="ev-tag up">金 ▲</span>
+          <span class="ev-tag up">BTC ▲</span>
+        </div>
+      </div>
+    </div>
+    <div class="events-col">
+      <div class="ev-item fantasy">
+        <div class="ev-type fantasy">FANTASY EVENT</div>
+        <div class="ev-name">🐉 ドラゴンが金融街を占拠。取引所が一時閉鎖</div>
+        <div class="ev-effects">
+          <span class="ev-tag dn">株 ▼▼▼</span>
+          <span class="ev-tag up">金 ▲▲</span>
+          <span class="ev-tag up">債券 ▲</span>
+        </div>
+      </div>
+      <div class="ev-item fantasy">
+        <div class="ev-type fantasy">FANTASY EVENT</div>
+        <div class="ev-name">🧙 魔法省が暗号通貨を公式通貨として認定</div>
+        <div class="ev-effects">
+          <span class="ev-tag up">BTC ▲▲▲</span>
+          <span class="ev-tag dn">ドル円 ▼</span>
+        </div>
+      </div>
+      <div class="ev-item fantasy">
+        <div class="ev-type fantasy">FANTASY EVENT</div>
+        <div class="ev-name">🌋 火山噴火で島国が消滅。不動産市場に衝撃</div>
+        <div class="ev-effects">
+          <span class="ev-tag dn">不動産 ▼▼</span>
+          <span class="ev-tag up">スタートアップ ▲</span>
+          <span class="ev-tag up">アート ▲</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RANKING -->
+<section class="ranking-section">
+  <div class="ranking-inner">
+    <div class="r">
+      <div class="sec-label">// DAILY RANKING</div>
+      <h2 class="sec-title">今日の相場、<br>あなたは<span class="hl">何位？</span></h2>
+      <p class="sec-body">全員同じイベント。でも職業も手札も判断も違う。フォローしてる人の結果が見えるから、毎日開かずにいられない。</p>
+    </div>
+    <div class="r">
+      <div class="rank-board">
+        <div class="rank-board-header">
+          <span>TODAY — DAY 23</span>
+          <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+        </div>
+        <div class="rank-row">
+          <div class="rn gold">1</div>
+          <div class="ru">
+            <div class="ra">🦊</div>
+            <div>
+              <div class="rname">タナカ投資家</div>
+              <div class="rjob">👨‍⚕️ 医者</div>
+            </div>
+          </div>
+          <div class="rret up" id="r1">+31.2%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rn gold">2</div>
+          <div class="ru">
+            <div class="ra">🐯</div>
+            <div>
+              <div class="rname">まちこ</div>
+              <div class="rjob">👔 管理職</div>
+            </div>
+          </div>
+          <div class="rret up" id="r2">+22.8%</div>
+        </div>
+        <div class="rank-row me">
+          <div class="rn">7</div>
+          <div class="ru">
+            <div class="ra">🐀</div>
+            <div>
+              <div class="rname">あなた</div>
+              <div class="rjob">🛒 アルバイト</div>
+            </div>
+          </div>
+          <div class="rret up" id="r3">+8.4%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rn">8</div>
+          <div class="ru">
+            <div class="ra">🦁</div>
+            <div>
+              <div class="rname">ゆーき</div>
+              <div class="rjob">💼 フリーランス</div>
+            </div>
+          </div>
+          <div class="rret dn" id="r4">-3.1%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rn">9</div>
+          <div class="ru">
+            <div class="ra">🐻</div>
+            <div>
+              <div class="rname">けんじろう</div>
+              <div class="rjob">👨‍⚕️ 医者</div>
+            </div>
+          </div>
+          <div class="rret dn" id="r5">-12.4%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GACHA -->
+<section class="gacha-section">
+  <div class="r">
+    <div class="sec-label">// DAILY GACHA</div>
+    <h2 class="sec-title">今日来ないと、<br><span class="hl">損する。</span></h2>
+    <p class="sec-body">毎日1回引けるガチャ。投資を有利にするボーナスカードや、明日のイベントのヒントが手に入ることも。ガチャの結果が今日の戦略を変える。</p>
+  </div>
+  <div class="gacha-grid r">
+    <div class="gc rare">
+      <span class="gc-badge">RARE</span>
+      <span class="gc-icon">🔮</span>
+      <div class="gc-name">明日の予報</div>
+      <div class="gc-desc">明日のイベントのヒントが1つ見える</div>
+    </div>
+    <div class="gc">
+      <span class="gc-icon">📈</span>
+      <div class="gc-name">株ブースト</div>
+      <div class="gc-desc">今日だけ株系の利益が1.5倍</div>
+    </div>
+    <div class="gc">
+      <span class="gc-icon">🛡️</span>
+      <div class="gc-name">固定費免除</div>
+      <div class="gc-desc">今日の固定費がゼロになる</div>
+    </div>
+    <div class="gc rare">
+      <span class="gc-badge">RARE</span>
+      <span class="gc-icon">🎰</span>
+      <div class="gc-name">宝くじ追加券</div>
+      <div class="gc-desc">今日の宝くじをもう1回引ける</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg">ESCAPE</div>
+  <h2 class="sec-title r" style="text-align:center;margin-bottom:16px;">続報を見逃すな。</h2>
+  <p class="sec-body r" style="margin:0 auto 36px;text-align:center;color:rgba(0,0,0,0.75);">開発の進捗・リリース情報はXで発信しています。<br>フォローしてお待ちください。</p>
+  <a href="https://x.com/atsusics_dev" target="_blank" class="btn-dark r">𝕏 @atsusics_dev をフォロー</a>
+</section>
+
+<footer>
+  <p>🐀 RAT RACE</p>
+  <p>© 2026 INDIE DEV — ALL RIGHTS RESERVED</p>
+</footer>
+
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+// No counter needed
+
+// Ranking live updates
+const rows = [
+  {id:'r1', base:31.2}, {id:'r2', base:22.8}, {id:'r3', base:8.4},
+  {id:'r4', base:-3.1}, {id:'r5', base:-12.4}
+];
+setInterval(() => {
+  rows.forEach(r => {
+    const v = r.base + (Math.random() - 0.5) * 2;
+    const el = document.getElementById(r.id);
+    const sign = v >= 0 ? '+' : '';
+    el.textContent = sign + v.toFixed(1) + '%';
+    el.className = 'rret ' + (v >= 0 ? 'up' : 'dn');
+  });
+}, 3500);
+
+// Balance animation
+const balances = ['¥1,842,000','¥1,956,000','¥1,720,000','¥2,103,000'];
+let bi = 0;
+setInterval(() => {
+  bi = (bi+1) % balances.length;
+  document.getElementById('balance').textContent = balances[bi];
+}, 4000);
+</script>
+</body>
+</html>
